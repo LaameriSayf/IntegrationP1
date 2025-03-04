@@ -7,6 +7,14 @@ const { validationResult } = require("express-validator");
 require("dotenv").config();
 
 // User Registration
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+    tls: { rejectUnauthorized: false },
+});
 
 const registerUser = async (req, res) => {
     try {
@@ -24,6 +32,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const imageUrl = req.file ? req.file.path : "";
+        const verificationToken1 = crypto.randomBytes(32).toString("hex");
 
         const newUser = new User({
             name,
@@ -33,9 +42,22 @@ const registerUser = async (req, res) => {
             role,
             image: imageUrl,
             isVerified: false, 
+            verificationToken,
+            estActif: false
+
+        });
+        const verificationUrl = `http://localhost:5001/api/users/verify/${verificationToken1}`;
+        await transporter.sendMail({
+            to: email,
+            subject: "Vérifiez votre email (Optionnel)",
+            html: `Cliquez sur ce lien pour vérifier votre email et activer votre compte : <a href="${verificationUrl}">${verificationUrl}</a><br>Vous pouvez vous connecter sans vérification.`,
         });
 
-        const verificationToken = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
+        res.status(201).json({ message: "User registered successfully. Check your email for verification (optional).", userId: newUser._id });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+        const verificationToken1 = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
 
@@ -64,10 +86,8 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             message: "User registered successfully. Please check your email to verify your account.",
         });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+    } ;
+
 
 
 // User Sign-In
@@ -93,7 +113,10 @@ const signInUser = async (req, res) => {
   
       const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
   
-      res.json({ token, role: user.role });
+      res.status(200).json({
+        token,
+        user: { id: user._id, name: user.name, email: user.email, role: user.role, estActif: user.estActif },
+    });
     } catch (error) {
       console.error("Sign-in error:", error);
       res.status(500).json({ message: "Server error" });

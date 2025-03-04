@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     role: {
@@ -39,6 +39,9 @@ const userSchema = new mongoose.Schema(
         ref: 'BankAccount',
       },
     ],
+    googleId: { type: String },
+    facebookId: { type: String },
+    entreprise: { type: mongoose.Schema.Types.ObjectId, ref: 'Entreprise' },
     image: {
       type: String, 
       default: '',
@@ -55,10 +58,21 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    lastLogin: { type: Date },
+    estActif: { type: Boolean, default: false }
+    
+
   },
-  { timestamps: true } 
+  { timestamps: true }
 
 );
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.generateAuthToken = function() {
+  return jwt.sign({ id: this._id, email: this.email, role: this.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
+};
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
