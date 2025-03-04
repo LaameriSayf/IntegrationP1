@@ -1,0 +1,276 @@
+/* Conteneur principal */
+.compte-bancaire-container {
+    padding: 2rem;
+    background-color: white; /* Fond blanc */
+    min-height: 100vh;
+}
+
+  
+.compte-bancaire-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+  
+/* Titre */
+.compte-bancaire-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+  
+/* Barre d'outils */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+  
+.filter-container {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+  
+.filter-icon {
+    color: #0fb815;
+    margin-right: 0.5rem;
+}
+  
+.filter-container input {
+    border: none;
+    outline: none;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+  
+.view-toggle-button {
+    display: flex;
+    align-items: center;
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+.view-toggle-button:hover {
+    background-color: #2563eb;
+}
+  
+.view-icon {
+    margin-right: 0.5rem;
+}
+  
+/* Cartes */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+/* Cartes */
+.card1 {
+    position: relative;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(59, 130, 246, 0.9)), 
+    url('https://static.vecteezy.com/ti/vecteur-libre/p1/16753026-50-carte-du-monde-ou-de-la-terre-hemispheres-terrestres-avec-continents-creation-de-logo-couleur-d-illustrationle-de-style-plat-modifiable-isolee-sur-fond-blanc-eps-10-gratuit-vectoriel.jpg'); /* Image carte du monde */
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1), 6px 6px 30px rgba(0, 0, 0, 0.2); /* Ombre 3D */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: white;
+    padding: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.15), 10px 10px 35px rgba(0, 0, 0, 0.25); /* Ombre 3D plus prononcée au survol */
+}
+
+/* Effet glossy amélioré (sans bloquer l'interaction) */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent);
+    z-index: 1;
+    pointer-events: none; /* Permet d'interagir avec les boutons et QR code */
+}
+
+
+.card-content {
+    position: relative;
+    z-index: 2;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.wallet-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-balance {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.balance-icon {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.card-dates {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem; /* Espacement entre les boutons */
+}
+
+/* Boutons d'action */
+.view-button,
+.delete-button,
+.qr-button {
+    background-color:transparent; /* Fond transparent */
+    border: none; /* Pas de bordure */
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Icônes sans fond */
+.view-button i,
+.delete-button i,
+.qr-button i {
+    background: none;
+    color: inherit; /* La couleur de l'icône hérite de la couleur du bouton */
+}
+
+/* Couleur des boutons selon le solde */
+.card-solde-superieur-100 .view-button {
+    background-color: #0fb815; /* Vert pour les comptes > 100 gold */
+    color: white;
+}
+
+.card-solde-superieur-100 .delete-button {
+    background-color: #ef4444; /* Rouge pour les comptes > 100 gold */
+    color: white;
+}
+
+.card-solde-inférieur-100 .view-button {
+    background-color: #1f2937; /* Noir pour les comptes <= 100 gold */
+    color: white;
+}
+
+.card-solde-inférieur-100 .delete-button {
+    background-color: #4b5563; /* Gris pour les comptes <= 100 gold */
+    color: white;
+}
+
+/* Effet au survol des boutons */
+.view-button:hover,
+.qr-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.delete-button:hover {
+    background-color: #dc2626;
+}
+
+/* Modal QR Code */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white !important; /* Fond blanc */
+    color: black; /* Texte noir pour la lisibilité */
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+}
+
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.qr-code-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.modal-info {
+    margin-bottom: 1rem;
+    
+}
+
+.modal-info p {
+    margin-bottom: 0.5rem;
+}
+
+.close-button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+    background-color: #2563eb;
+}
+
+/* Messages */
+.loading-message,
+.no-data-message {
+    text-align: center;
+    color: #64748b;
+    margin-top: 2rem;
+}

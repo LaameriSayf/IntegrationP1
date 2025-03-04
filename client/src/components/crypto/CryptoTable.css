@@ -1,0 +1,103 @@
+/* CryptoTable.css */
+.crypto-dashboard {
+    padding: 20px;
+    background-color: #1e1e2f;
+    color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .news-ticker {
+    overflow: hidden;
+    white-space: nowrap;
+    background-color: #2a2a40;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .news-ticker-content {
+    display: inline-block;
+    animation: ticker 20s linear infinite;
+  }
+  
+  @keyframes ticker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  
+  .news-item {
+    display: inline-block;
+    margin-right: 50px;
+    font-size: 16px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #444;
+    border-radius: 5px;
+    background-color: #2a2a40;
+    color: #ffffff;
+  }
+  
+  .search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #007bff;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .page-size-select {
+    width: auto;
+    margin-left: 10px;
+  }
+  
+  .crypto-table-container {
+    margin-top: 20px;
+  }
+  
+  .crypto-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2a2a40;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .crypto-table th,
+  .crypto-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+  }
+  
+  .crypto-table th {
+    background-color: #007bff;
+    color: #ffffff;
+    font-weight: bold;
+  }
+  
+  .crypto-table tbody tr:hover {
+    background-color: #3a3a5a;
+    transition: background-color 0.3s ease;
+  }
+  
+  .favorite-button {
+    background-color: transparent;
+    border: none;
+    color: #ffc107;
+    transition: color 0.3s ease;
+  }
+  
+  .favorite-button:hover {
+    color: #e0a800;
+  }
