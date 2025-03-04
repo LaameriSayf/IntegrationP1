@@ -1,0 +1,33 @@
+[
+    {
+      "name": "Ali Ben Salem",
+      "email": "ali.bensalem@example.com",
+      "password": "hashedpassword123",
+      "mail": "ali.bensalem@example.com",
+      "phoneNumber": "+21698123456",
+      "role": "Business owner",
+      "entreprise": "65fa7c3b3c2b4e001c8e4a12",
+      "bankAccounts": ["65fa7d5e3c2b4e001c8e4b56"]
+    },
+    {
+      "name": "Sami Trabelsi",
+      "email": "sami.trabelsi@example.com",
+      "password": "hashedpassword456",
+      "mail": "sami.trabelsi@example.com",
+      "phoneNumber": "+21698567890",
+      "role": "Financial manager",
+      "entreprise": "65fa7c3b3c2b4e001c8e4a13",
+      "bankAccounts": ["65fa7d5e3c2b4e001c8e4b57", "65fa7d5e3c2b4e001c8e4b58"]
+    },
+    {
+      "name": "Rim Jebali",
+      "email": "rim.jebali@example.com",
+      "password": "hashedpassword789",
+      "mail": "rim.jebali@example.com",
+      "phoneNumber": "+21698456789",
+      "role": "Accountant",
+      "entreprise": "65fa7c3b3c2b4e001c8e4a14",
+      "bankAccounts": []
+    }
+  ]
+  
