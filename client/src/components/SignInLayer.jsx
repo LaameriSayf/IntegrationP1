@@ -1,40 +1,42 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import axios from 'axios';
 
-const SignInLayer = () => {
+const SignInPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  
-  const [verificationMessage, setVerificationMessage] = useState('');
+
   const navigate = useNavigate();
   const { email, password } = formData;
-  const location = useLocation(); 
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('verified') === 'true') {
-      setVerificationMessage("You have successfully verified your email!");
-    }
-  }, [location.search]);
 
   const onChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = async e => {
     e.preventDefault();
+    console.log('Form data:', formData);
     try {
       const res = await axios.post('http://localhost:5001/api/users/sign-in', formData);
-      const { token, role } = res.data;
       console.log(res.data);
 
+      const { token, user } = res.data;
       localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
+      localStorage.setItem('role', user.role);
 
-      switch (role) {
+      toast.success("Connexion réussie !", {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
+      switch (user.role) {
         case 'Admin':
           navigate("/admin-dashboard");
           break;
@@ -76,11 +78,6 @@ const SignInLayer = () => {
               Welcome back! Please enter your details
             </p>
           </div>
-          {verificationMessage && (
-            <div className="alert alert-success mb-4">
-              {verificationMessage}
-            </div>
-          )}
           <form onSubmit={onSubmit}>
             <div className='icon-field mb-16'>
               <span className='icon top-50 translate-middle-y'>
@@ -97,7 +94,7 @@ const SignInLayer = () => {
               />
             </div>
             <div className='mb-20'>
-              <div className='position-relative '>
+              <div className='position-relative'>
                 <div className='icon-field'>
                   <span className='icon top-50 translate-middle-y'>
                     <Icon icon='solar:lock-password-outline' />
@@ -113,7 +110,14 @@ const SignInLayer = () => {
                     required
                   />
                 </div>
+                <span
+                  className='toggle-password ri-eye-line cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light'
+                  data-toggle='#your-password'
+                />
               </div>
+              <span className='mt-12 text-sm text-secondary-light'>
+                Your password must have at least 8 characters
+              </span>
             </div>
             <button
               type='submit'
@@ -128,6 +132,21 @@ const SignInLayer = () => {
                   Reset Password
                 </Link>
               </p>
+            </div>
+            <div className='mt-32 center-border-horizontal text-center'>
+              <span className='bg-base z-1 px-4'>Or sign in with</span>
+            </div>
+            <div className='mt-32 d-flex align-items-center gap-3'>
+              <Link
+                to='/auth/google'
+                className='fw-semibold text-primary-light py-16 px-24 w-50 border radius-12 text-md d-flex align-items-center justify-content-center gap-12 line-height-1 bg-hover-primary-50'
+              >
+                <Icon
+                  icon='logos:google-icon'
+                  className='text-primary-600 text-xl line-height-1'
+                />
+                Google
+              </Link>
             </div>
             <div className='mt-32 text-center text-sm'>
               <p className='mb-0'>
@@ -144,4 +163,4 @@ const SignInLayer = () => {
   );
 };
 
-export default SignInLayer;
+export default SignInPage;

@@ -27,6 +27,7 @@
     "datatables.net": "^2.1.8",
     "datatables.net-dt": "^2.1.8",
     "flatpickr": "^4.6.13",
+    "framer-motion": "^12.4.10",
     "highlight.js": "^11.10.0",
     "isotope-layout": "^3.0.6",
     "jquery": "^3.7.1",
@@ -42,6 +43,7 @@
     "react-fast-marquee": "^1.6.5",
     "react-icons": "^5.5.0",
     "react-modal-video": "^2.0.2",
+    "react-phone-input-2": "^2.15.1",
     "react-qr-code": "^2.0.15",
     "react-quill": "^2.0.0",
     "react-quill-new": "^3.3.3",
@@ -54,6 +56,7 @@
     "react-table": "^7.8.0",
     "react-toastify": "^10.0.5",
     "slick-carousel": "^1.8.1",
+    "sweetalert2": "^11.17.2",
     "uuid": "^10.0.0",
     "web-vitals": "^2.1.4",
     "wowjs": "^1.1.3"

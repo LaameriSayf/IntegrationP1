@@ -6,7 +6,6 @@ const { User } = require("../models/user");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
 
-// User Registration
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -32,7 +31,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const imageUrl = req.file ? req.file.path : "";
-        const verificationToken1 = crypto.randomBytes(32).toString("hex");
+        const verificationToken = crypto.randomBytes(32).toString("hex");
 
         const newUser = new User({
             name,
@@ -41,12 +40,13 @@ const registerUser = async (req, res) => {
             phoneNumber,
             role,
             image: imageUrl,
-            isVerified: false, 
             verificationToken,
-            estActif: false
-
+            estActif: false,
         });
-        const verificationUrl = `http://localhost:5001/api/users/verify/${verificationToken1}`;
+
+        await newUser.save();
+
+        const verificationUrl = `http://localhost:5001/api/users/verify/${verificationToken}`;
         await transporter.sendMail({
             to: email,
             subject: "Vérifiez votre email (Optionnel)",
@@ -57,72 +57,37 @@ const registerUser = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-        const verificationToken1 = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
-        });
-
-        newUser.verificationToken = verificationToken;
-        await newUser.save();
-
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-
-        const verificationUrl = `http://localhost:5001/api/users/verify-email/${verificationToken}?email=${newUser.email}&redirect=sign-in`;
-
-        const mailOptions = {
-            to: newUser.email,
-            from: process.env.EMAIL_USER,
-            subject: "Email Verification",
-            text: `Please click the link below to verify your email address:\n\n${verificationUrl}`,
-        };
-
-        await transporter.sendMail(mailOptions);
-
-        res.status(201).json({
-            message: "User registered successfully. Please check your email to verify your account.",
-        });
-    } ;
-
-
-
-// User Sign-In
+};
 
 const signInUser = async (req, res) => {
     try {
-      const { email, password } = req.body;
-  
-      const user = await User.findOne({ email });
-     
-      if (!user) {
-        return res.status(400).json({ message: "User not found" });
-      }
-  
-      if (!user.isVerified) {
-        return res.status(403).json({ message: "Please verify your email before signing in." });
-      }
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Invalid credentials" });
-      }
-  
-      const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-  
-      res.status(200).json({
-        token,
-        user: { id: user._id, name: user.name, email: user.email, role: user.role, estActif: user.estActif },
-    });
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        // Pas d'obligation de vérification : générer le token même si estActif est false
+        const token = jwt.sign(
+            { id: user._id, email: user.email, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" }
+        );
+
+        res.status(200).json({
+            token,
+            user: { id: user._id, name: user.name, email: user.email, role: user.role, estActif: user.estActif },
+        });
     } catch (error) {
-      console.error("Sign-in error:", error);
-      res.status(500).json({ message: "Server error" });
+        res.status(500).json({ message: error.message });
     }
-  };
-  
+};
 
 // Request Password Reset
 

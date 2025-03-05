@@ -19,6 +19,11 @@ import Sidebar from "./components/backofficeDashboard/Sidebar";
 import "./App.css";
 import ViewProfilePage from "./pages/ViewProfilePage.jsx";
 import UsersListPage from "./pages/UsersListPage.jsx";  
+import CompleteProfile from "./pages/CompleteProfileLayer.jsx";
+import Confirmation from "./pages/ConfirmationLayer.jsx";
+import AdminPanel from "./pages/AdminPanel.jsx";
+import StatPage from "./pages/StatPage.jsx";
+import VerifyEmail from "./pages/VerifyEmailPage.jsx";
 // Composant qui utilise useNavigate() et contient la logique de navigation vocale et les routes
 function MainApp() {
   const userId = "67bde12663b4be3e706162f3";
@@ -70,7 +75,7 @@ function MainApp() {
 
   return (
     <div className="app">
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+     
       <div className={`main-content ${isSidebarOpen ? "shifted" : ""}`}>
         <h3>🗣️ Navigation Vocale</h3>
         <p>{listening ? "🎤 Écoute en cours..." : "🛑 En pause"}</p>
@@ -79,11 +84,18 @@ function MainApp() {
         <button onClick={SpeechRecognition.stopListening}>⏹️ Arrêter</button>
 
         <Routes>
+          
           <Route path="/" element={<AccessDeniedPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:userId/:token" element={<ResetPasswordPage />} />
+          <Route exact path="/complete-profile" element={<CompleteProfile />} />
+        <Route path="/confirmation" element={<Confirmation />} />
+        <Route path="/deleteUsers" element={<AdminPanel/>} />
+        <Route path="/StatUsers" element={<StatPage/>} />
+        <Route path="/verify-email" element={<VerifyEmail />} /> {/* Nouvelle route */}
+
 
           <Route
             path="/admin-dashboard"
