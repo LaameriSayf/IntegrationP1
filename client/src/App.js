@@ -83,7 +83,7 @@ function MainApp() {
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/reset-password/:userId/:token" element={<ResetPasswordPage />} />
 
           <Route
             path="/admin-dashboard"

@@ -1,12 +1,18 @@
 import React from "react";
-import ResetPasswordLayer from "../components/ResetPassword";
+import { useParams } from "react-router-dom";
+import ResetPasswordLayer from "../components/ResetPasswordLayer";
 
 const ResetPasswordPage = () => {
+  const { token } = useParams(); // Get token from URL
+
   return (
     <>
-      <ResetPasswordLayer />
+
+      {/* ResetPasswordPageLayer */}
+      <ResetPasswordLayer  token={token} />
+
     </>
   );
 };
 
-export default ResetPasswordPage;
+export default ResetPasswordPage; 
