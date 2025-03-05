@@ -1,3 +1,5 @@
+
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -89,7 +91,6 @@ const signInUser = async (req, res) => {
     }
 };
 
-// Request Password Reset
 
 const requestPasswordReset = async (req, res) => {
     const { email } = req.body;
@@ -269,9 +270,28 @@ const fetchUsersByFilters = async (req, res) => {
         res.status(500).json({ message: "Server error", error });
     }
 };
+const logout = (req, res) => {
+    res.cookie("token", "", { maxAge: 0 });
+    res.json({ message: "Logged out successfully" });
+};
 
+const checkAuth = async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
 
+        const user = await User.findById(req.user.userId).select("-password"); // Exclude password
 
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 module.exports = { 
     registerUser, 
     signInUser, 
@@ -279,5 +299,7 @@ module.exports = {
     resetPassword, 
     verifyEmail, 
     resendVerificationEmail,
-    fetchUsersByFilters
+    fetchUsersByFilters,
+    logout,
+    checkAuth,
 };

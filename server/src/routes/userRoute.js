@@ -1,5 +1,5 @@
 const express = require('express');
-const { registerUser , signInUser , verifyEmail , resendVerificationEmail , fetchUsersByFilters } = require('../controllers/userController');
+const { registerUser , signInUser , verifyEmail , resendVerificationEmail , fetchUsersByFilters,logout ,checkAuth} = require('../controllers/userController');
 const upload = require('../middlewares/uploadImage');
 const router = express.Router();
 require('../controllers/userController');
@@ -7,6 +7,7 @@ const { User } = require('../models/user');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const authMiddlewaree = require('../middlewares/authorization');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -55,6 +56,8 @@ router.post('/sign-in', signInUser);
 router.get('/verify-email/:verificationToken', verifyEmail);
 router.post('/resend-verification-email', resendVerificationEmail);
 router.get('/view-users', fetchUsersByFilters); 
+router.get('/me', authMiddlewaree(), checkAuth); // Apply authentication middleware
+
 router.get('/dashboard', authMiddleware, checkActive, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
@@ -112,6 +115,7 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Erreur interne du serveur' });
     }
 });
+router.post('/logout', logout);
 
 
 module.exports = router;

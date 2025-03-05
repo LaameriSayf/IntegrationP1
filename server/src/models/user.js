@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema(
     ],
     googleId: { type: String },
     facebookId: { type: String },
+   
     entreprise: { type: mongoose.Schema.Types.ObjectId, ref: 'Entreprise' },
     image: {
       type: String, 

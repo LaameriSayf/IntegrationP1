@@ -1,9 +1,11 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState , useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css'; 
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 
 const handleGoogleSignIn = () => {
@@ -19,6 +21,8 @@ const handleFacebookSignIn = () => {
 const SignUpLayer = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
+  const [loading, setLoading ] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -48,8 +52,97 @@ const SignUpLayer = () => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
+  const validatePhoneNumber = (phoneNumber) => {
+    const digitsOnly = phoneNumber.replace(/\D/g, ""); 
+    return digitsOnly.length >= 8 && digitsOnly.length <= 15; 
+  };
+  const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validatePassword = (password) => {
+    const re = /^(?=.*[A-Z])(?=.*\d{3,}).{8,}$/;
+    return re.test(password);
+  };
+  const handlePhoneChange = (value) => {
+    setFormData({ ...formData, phoneNumber: value });
+  };
+
+  const validateForm = () => {
+    const { name, email, password, phoneNumber, role } = formData;
+    const checkbox = document.getElementById('condition').checked;
+
+    if (!name || !email || !password || !phoneNumber || !role) {
+      toast.error('Please fill in all the required fields.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+    if (!validateEmail(email)) {
+      toast.error('Please enter a valid email address.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+    if (!validatePhoneNumber(phoneNumber)) {
+      toast.error('Please enter a valid phoneNumber.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+    if (!validatePassword(password)) {
+      toast.error('Password must be at least 8 characters long, contain 1 uppercase letter and at least 3 numbers.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+    if (!checkbox) {
+      toast.error('You must agree to the Terms & Conditions and Privacy Policy.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return false;
+    }
+    return true;
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
+    if (!validateForm()){
+      setLoading(false);
+      return;} 
+   
+   
     const data = new FormData();
     for (const key in formData) {
       data.append(key, formData[key]);
@@ -71,6 +164,8 @@ const SignUpLayer = () => {
         draggable: true,
         progress: undefined,
       });
+      setTimeout(() => {navigate('/sign-in'); },3000);
+
     } catch (error) {
       console.error('Error during sign-up:', error.response ? error.response.data : error.message);
     
@@ -127,9 +222,7 @@ const SignUpLayer = () => {
       <div className='auth-right py-32 px-24 d-flex flex-column justify-content-center'>
         <div className='max-w-464-px mx-auto w-100'>
           <div>
-            <Link to='/' className='mb-40 max-w-290-px'>
-              <img src='/assets/images/2.png' alt='LOGO FINOVA' />
-            </Link>
+            
             <h4 className='mb-12'>Sign Up to your Account</h4>
             <p className='mb-32 text-secondary-light text-lg'>
               Welcome back! please enter your detail
@@ -191,15 +284,18 @@ const SignUpLayer = () => {
               <span className='icon top-50 translate-middle-y'>
                 <Icon icon='mdi:phone' />
               </span>
-              <input
-                type='text'
-                name='phoneNumber'
+              <PhoneInput
+                country={"tn"} // Default to Tunisia (+216)
+                name='phoneNumber' 
                 value={formData.phoneNumber}
-                onChange={handleChange}
-                className='form-control h-56-px bg-neutral-50 radius-12'
+                onChange={handlePhoneChange}
                 placeholder='Phone Number'
+                enableSearch={true} // Allows searching countries
               />
             </div>
+            <span className="mt-12 text-sm text-secondary-light">
+              Add a valid phone number (select your country of residence)
+            </span>
             <div className='icon-field mb-16'>
               <span className='icon top-50 translate-middle-y'>
                 <Icon icon='mdi:account' />
