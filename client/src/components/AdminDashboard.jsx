@@ -4,8 +4,9 @@ import TotalSubscriberOne from './child/TotalSubscriberOne';
 import UsersOverviewOne from './child/UsersOverviewOne';
 import LatestRegisteredOne from './child/LatestRegisteredOne';
 import TopPerformerOne from './child/TopPerformerOne';
-
 import UnitCountOne from './child/UnitCountOne';
+import StatStatisticOne from './child/StatStatisticOne';
+
 
 const AdminDashboard = () => {
 
@@ -19,12 +20,15 @@ const AdminDashboard = () => {
                 {/* SalesStatisticOne */}
                 <SalesStatisticOne />
 
-                {/* TotalSubscriberOne */}
-                <TotalSubscriberOne />
-
                 {/* UsersOverviewOne */}
                 <UsersOverviewOne />
+                
 
+                <StatStatisticOne />
+
+               
+                {/* TotalSubscriberOne */}
+                 <TotalSubscriberOne />
                 {/* LatestRegisteredOne */}
                 <LatestRegisteredOne />
 

@@ -7,11 +7,9 @@ import axios from "axios";
 const MasterLayout = ({ children }) => {
   let [sidebarActive, seSidebarActive] = useState(false);
   let [mobileMenu, setMobileMenu] = useState(false);
-  const location = useLocation(); // Hook to get the current route
+  const location = useLocation(); 
   const navigate = useNavigate();
   const [user, setUser] = useState(null); 
-
-
 
   const fetchUserData = async () => {
     try {

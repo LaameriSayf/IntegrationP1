@@ -482,139 +482,114 @@ const useReactApexChart = () => {
     );
   };
 
-  let createChartTwo = (chartColor, height) => {
+  const createChartTwo = (chartColor, height, seriesData = [], chartType = 'area', options = {}) => {
     let series = [
       {
-        name: "This Day",
-        data: [4, 18, 13, 40, 30, 50, 30, 60, 40, 75, 45, 90],
-      },
-    ];
+        name: "Flux de Trésorerie",
+        data: seriesData.length > 0
+          ? seriesData.map((item) => ({
+              x: item.x,
+              y: item.type === 'credit' ? item.amount : -item.amount,
+            }))
+          : [{ x: new Date().getTime(), y: 0 }],
+      }
+      ];
 
-    let options = {
+    let defaultOptions = {
       chart: {
-        type: "area",
+        type: chartType,
         width: "100%",
-        height: 162,
-        sparkline: {
-          enabled: false, // Remove whitespace
-        },
-        toolbar: {
-          show: false,
-        },
-        padding: {
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0,
-        },
+        height: height || '300px', // Hauteur par défaut à 300px
+        zoom: { enabled: true }, // Activer le zoom
+        toolbar: { show: true, tools: { download: true } }, // Activer download
+        padding: { left: 0, right: 0, top: 0, bottom: 0 },
       },
-      dataLabels: {
-        enabled: false,
-      },
+      dataLabels: { enabled: false },
       stroke: {
-        curve: "smooth",
-        width: 4,
+        curve: chartType === 'line' ? 'straight' : 'smooth',
+        width: 2,
         colors: [chartColor],
         lineCap: "round",
       },
       grid: {
         show: true,
-        borderColor: "red",
+        borderColor: "#e0e0e0",
         strokeDashArray: 0,
         position: "back",
-        xaxis: {
-          lines: {
-            show: false,
-          },
-        },
-        yaxis: {
-          lines: {
-            show: false,
-          },
-        },
-        row: {
-          colors: undefined,
-          opacity: 0.5,
-        },
-        column: {
-          colors: undefined,
-          opacity: 0.5,
-        },
-        padding: {
-          top: -30,
-          right: 0,
-          bottom: -10,
-          left: 0,
-        },
+        xaxis: { lines: { show: false } },
+        yaxis: { lines: { show: true } },
+        padding: { top: 0, right: 0, bottom: 0, left: 0 },
       },
       fill: {
-        type: "gradient",
-        colors: [chartColor], // Set the starting color (top color) here
+        type: chartType === 'bar' ? 'solid' : 'gradient',
+        colors: [chartColor],
         gradient: {
-          shade: "light", // Gradient shading type
-          type: "vertical", // Gradient direction (vertical)
-          shadeIntensity: 0.5, // Intensity of the gradient shading
-          gradientToColors: [`${chartColor}00`], // Bottom gradient color (with transparency)
-          inverseColors: false, // Do not invert colors
-          opacityFrom: 0.6, // Starting opacity
-          opacityTo: 0.3, // Ending opacity
+          shade: "light",
+          type: "vertical",
+          shadeIntensity: 0.5,
+          gradientToColors: [`${chartColor}00`],
+          inverseColors: false,
+          opacityFrom: 0.4,
+          opacityTo: 0.1,
           stops: [0, 100],
         },
       },
-      // Customize the circle marker color on hover
       markers: {
         colors: [chartColor],
-        strokeWidth: 3,
-        size: 0,
-        hover: {
-          size: 10,
-        },
+        strokeWidth: 2,
+        size: 6,
+        hover: { size: 8 },
       },
       xaxis: {
-        categories: [
-          `Jan`,
-          `Feb`,
-          `Mar`,
-          `Apr`,
-          `May`,
-          `Jun`,
-          `Jul`,
-          `Aug`,
-          `Sep`,
-          `Oct`,
-          `Nov`,
-          `Dec`,
-        ],
-        tooltip: {
-          enabled: false,
-        },
-        labels: {
-          formatter: function (value) {
-            return value;
-          },
-          style: {
-            fontSize: "14px",
-          },
-        },
+        type: "datetime",
+        labels: { format: "dd MMM HH:mm", style: { fontSize: "10px" } },
+        tooltip: { enabled: false },
       },
       yaxis: {
         labels: {
-          show: false,
+          show: true,
+          formatter: (val) => `${val.toFixed(2)} €`,
+          style: { fontSize: "10px" },
         },
+        title: { text: "" },
       },
       tooltip: {
-        x: {
-          format: "dd/MM/yy HH:mm",
-        },
+        x: { format: "dd/MM/yy HH:mm" },
+        y: { formatter: (val) => `${val.toFixed(2)} €` },
+      },
+      annotations: {
+        points: seriesData.map((item) => ({
+          x: item.x,
+          y: item.type === 'credit' ? item.amount : -item.amount,
+          marker: {
+            size: 6,
+            fillColor: item.type === 'credit' ? '#00E396' : '#FF4560',
+            strokeColor: '#fff',
+            radius: 2,
+          },
+          label: {
+            borderColor: item.type === 'credit' ? '#00E396' : '#FF4560',
+            style: {
+              color: '#fff',
+              background: item.type === 'credit' ? '#00E396' : '#FF4560',
+              fontSize: '9px',
+              padding: { left: 4, right: 4, top: 2, bottom: 2 },
+            },
+            text: `${item.type}: ${item.amount.toFixed(2)} €`,
+            offsetY: -15,
+          },
+        })),
       },
     };
 
+    const finalOptions = { ...defaultOptions, ...options };
+
     return (
       <ReactApexChart
-        options={options}
+        options={finalOptions}
         series={series}
-        type='area'
-        height={height}
+        type={chartType}
+        height={height || '300px'}
       />
     );
   };
@@ -5344,7 +5319,7 @@ const useReactApexChart = () => {
     grid: {
       show: true,
       borderColor: "#D1D5DB",
-      strokeDashArray: 4, // Use a number for dashed style
+      strokeDashArray: 4, 
       position: "back",
     },
     plotOptions: {

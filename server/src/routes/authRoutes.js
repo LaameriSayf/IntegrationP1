@@ -2,7 +2,6 @@ const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
 const { User } = require('../models/user');
 const { Activity } = require('../models/activity');
 require('dotenv').config();
@@ -10,136 +9,140 @@ const upload = require('../middlewares/uploadImage');
 const nodemailer = require('nodemailer');
 
 const router = express.Router();
+
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     tls: { rejectUnauthorized: false },
 });
 
+// Google Auth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/google/callback',
+router.get(
+    '/google/callback',
     passport.authenticate('google', { failureRedirect: '/sign-in' }),
     async (req, res) => {
-        const user = req.user;
+        try {
+            const user = req.user;
+            console.log("Utilisateur après Google auth:", user);
 
-        // Générer un mot de passe temporaire pour chaque connexion
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await bcrypt.hash(tempPassword, 10);
-        const verificationToken = crypto.randomBytes(32).toString('hex');
+            const existingUser = await User.findOne({ email: user.email });
+            if (existingUser && existingUser.isVerified) {
+                const sessionToken = jwt.sign(
+                    { userId: existingUser._id, role: existingUser.role },
+                    process.env.JWT_SECRET || 'secret_key',
+                    { expiresIn: '24h' }
+                );
+                console.log("Utilisateur existant, token de session:", sessionToken);
 
-        // Mettre à jour l'utilisateur avec le nouveau mot de passe et le token
-        user.password = hashedPassword;
-        user.verificationToken = verificationToken;
-        // Ne pas modifier estActif ici, laisser false jusqu'à vérification manuelle
-        await user.save();
+                await Activity.create({ userId: existingUser._id, action: "Connexion Google", date: new Date() });
 
-        // Email 1 : Mot de passe temporaire
-        await transporter.sendMail({
-            to: user.email,
-            subject: "Votre mot de passe temporaire",
-            html: `Voici votre mot de passe temporaire pour vous connecter : <strong>${tempPassword}</strong><br>Utilisez-le pour vous connecter immédiatement.`,
-        });
+                res.redirect(`http://localhost:3000/auth-callback?token=${sessionToken}&role=${existingUser.role}`);
+            } else {
+                const verificationToken = jwt.sign(
+                    { userId: user._id },
+                    process.env.JWT_SECRET || 'secret_key',
+                    { expiresIn: '24h' }
+                );
+                console.log("Token généré pour Google (nouvel utilisateur):", verificationToken);
 
-        // Email 2 : Lien de vérification (optionnel)
-        const verificationUrl = `http://localhost:5001/api/users/verify/${verificationToken}`;
-        await transporter.sendMail({
-            to: user.email,
-            subject: "Vérifiez votre connexion Google (Optionnel)",
-            html: `Cliquez sur ce lien pour vérifier votre compte (facultatif) : <a href="${verificationUrl}">${verificationUrl}</a><br>Vous pouvez vous connecter sans vérification.`,
-        });
+                await user.save();
 
-        await Activity.create({ userId: user.id, action: "Connexion Google", date: new Date() });
+                await transporter.sendMail({
+                    to: user.email,
+                    subject: "Vérifiez votre compte",
+                    html: `Veuillez vérifier votre compte pour activer votre profil. Complétez votre profil pour finaliser l'inscription.`,
+                });
 
-        // Redirection vers /verify-email avec email et token
-        res.redirect(`http://localhost:3000/verify-email?email=${user.email}&token=${verificationToken}`);
-    }
-);
+                await Activity.create({ userId: user._id, action: "Inscription Google", date: new Date() });
 
-// Même logique pour Facebook (simplifiée ici pour brièveté)
-router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-
-router.get('/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
-    async (req, res) => {
-        const user = req.user;
-
-        if (user.estActif) {
-            const token = jwt.sign(
-                { id: user._id, email: user.email, role: user.role },
-                process.env.JWT_SECRET,
-                { expiresIn: '2h' }
-            );
-            await Activity.create({ userId: user.id, action: "Connexion Facebook", date: new Date() });
-            res.redirect(`http://localhost:3000/admin-dashboard?token=${token}`);
-        } else {
-            const verificationToken = require('crypto').randomBytes(32).toString('hex');
-            user.verificationToken = verificationToken;
-            user.estActif = false;
-            await user.save();
-
-            const verificationUrl = `http://localhost:5001/api/users/verify/${verificationToken}`;
-            await transporter.sendMail({
-                to: user.email,
-                subject: "Vérifiez votre connexion Facebook",
-                html: `Cliquez sur ce lien pour vérifier votre connexion : <a href="${verificationUrl}">${verificationUrl}</a>`,
-            });
-
-            await Activity.create({ userId: user.id, action: "Connexion Facebook", date: new Date() });
-            res.redirect(`http://localhost:3000/verify-email?email=${user.email}`);
+                res.redirect(`http://localhost:3000/complete-profile?userId=${user._id}&provider=google`);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la callback Google:", error);
+            res.redirect('/sign-in');
         }
     }
 );
 
-router.post('/complete-profile', upload.single('image'), async (req, res) => {
-    try {
-        const { userId, password, confirmPassword, phoneNumber, role } = req.body;
-        if (!userId) return res.status(400).json({ message: "ID utilisateur manquant." });
-        if (password !== confirmPassword) return res.status(400).json({ message: "Les mots de passe ne correspondent pas." });
+// Facebook Auth
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const imageUrl = req.file ? req.file.path : "";
+router.get(
+    '/facebook/callback',
+    passport.authenticate('facebook', { failureRedirect: '/auth/sign-in' }),
+    async (req, res) => {
+        try {
+            const user = req.user;
+            console.log("Utilisateur après Facebook auth:", user);
 
-        const user = await User.findByIdAndUpdate(userId, {
-            password: hashedPassword,
-            phoneNumber,
-            role,
-            image: imageUrl,
-            verificationToken: require('crypto').randomBytes(32).toString('hex'),
-        }, { new: true });
+            const existingUser = await User.findOne({ email: user.email });
+            if (existingUser && existingUser.isVerified) {
+                const sessionToken = jwt.sign(
+                    { userId: existingUser._id, role: existingUser.role },
+                    process.env.JWT_SECRET || 'secret_key',
+                    { expiresIn: '24h' }
+                );
+                console.log("Utilisateur existant, token de session:", sessionToken);
 
-        if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
+                await Activity.create({ userId: existingUser._id, action: "Connexion Facebook", date: new Date() });
 
-        const verificationUrl = `http://localhost:5001/api/users/verify/${user.verificationToken}`;
-        await transporter.sendMail({
-            to: user.email,
-            subject: "Vérifiez votre compte",
-            html: `Cliquez sur ce lien pour vérifier votre compte : <a href="${verificationUrl}">${verificationUrl}</a>`,
-        });
+                res.redirect(`http://localhost:3000/auth-callback?token=${sessionToken}&role=${existingUser.role}`);
+            } else {
+                const verificationToken = jwt.sign(
+                    { userId: user._id },
+                    process.env.JWT_SECRET || 'secret_key',
+                    { expiresIn: '24h' }
+                );
+                console.log("Token généré pour Facebook (nouvel utilisateur):", verificationToken);
 
-        res.status(200).json({ message: "Profil complété. Vérifiez votre email.", userId: user._id });
-    } catch (error) {
-        console.error("Erreur lors de l'inscription :", error);
-        res.status(500).json({ message: "Erreur serveur.", error });
+                await user.save();
+
+                await transporter.sendMail({
+                    to: user.email,
+                    subject: "Vérifiez votre compte",
+                    html: `Veuillez vérifier votre compte pour activer votre profil. Complétez votre profil pour finaliser l'inscription.`,
+                });
+
+                await Activity.create({ userId: user._id, action: "Inscription Facebook", date: new Date() });
+
+                res.redirect(`http://localhost:3000/complete-profile?userId=${user._id}&provider=facebook`);
+            }
+        } catch (error) {
+            console.error("Erreur lors de la callback Facebook:", error);
+            res.redirect('/auth/sign-in');
+        }
     }
-});
+);
 
-router.post('/update-profile', async (req, res) => {
+// Compléter le profil
+router.post('/complete-profile', upload.single('image'), async (req, res) => {
+    const { userId, phoneNumber, password, role } = req.body;
     try {
-        const { userId, phoneNumber } = req.body;
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "Utilisateur non trouvé" });
-
+        if (!user) {
+            return res.status(404).json({ message: "Utilisateur non trouvé" });
+        }
         user.phoneNumber = phoneNumber;
+        if (password) {
+            user.password = await bcrypt.hash(password, 10); // Mise à jour du mot de passe
+        }
+        user.role = role;
+        if (req.file) {
+            user.image = req.file.path;
+        }
+        user.isVerified = true;
         await user.save();
-        await Activity.create({ userId: userId, action: "Mise à jour du profil" });
 
-        res.json({ message: "Profil mis à jour avec succès" });
+        res.status(200).json({ message: "Profil complété et vérifié avec succès" });
     } catch (error) {
+        console.error("Erreur lors de la complétion du profil:", error);
         res.status(500).json({ message: "Erreur serveur" });
     }
 });
 
+// Logout
 router.get('/logout', (req, res, next) => {
     req.logout((err) => {
         if (err) return next(err);

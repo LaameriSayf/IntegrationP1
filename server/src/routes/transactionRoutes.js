@@ -4,7 +4,6 @@ const transactionController = require('../controllers/transactionController');
 const FinancialTransaction = require('../models/FinancialTransaction');
 const aiService = require('../services/aiService');
 const mongoose = require('mongoose');
-const User = require('../models/user');
 const CompteBancaire = require('../models/compteBancaire');
 const Transaction = require('../models/FinancialTransaction');
 const requestIp = require('request-ip'); // Pour récupérer l'adresse IP

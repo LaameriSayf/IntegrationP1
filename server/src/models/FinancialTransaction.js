@@ -12,6 +12,9 @@ const transactionSchema = new mongoose.Schema({
   location: { type: String },
   anomalie: { type: Boolean, default: false },
   commentaireAnomalie: { type: String, default: "" }
-});
+},
+{ collection: "transactions" }
+);
 
 module.exports = mongoose.model('Transaction', transactionSchema);
+

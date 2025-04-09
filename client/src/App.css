@@ -119,3 +119,10 @@
     padding: 16px;
   }
 }
+
+.accountant-dashboard { padding: 20px; }
+.customize-section { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+.widgets-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.widget { border: 1px solid #ccc; padding: 15px; border-radius: 5px; background-color: #f9f9f9; }
+
+

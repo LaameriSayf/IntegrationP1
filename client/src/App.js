@@ -22,8 +22,12 @@ import UsersListPage from "./pages/UsersListPage.jsx";
 import CompleteProfile from "./pages/CompleteProfileLayer.jsx";
 import Confirmation from "./pages/ConfirmationLayer.jsx";
 import AdminPanel from "./pages/AdminPanel.jsx";
-import StatPage from "./pages/StatPage.jsx";
 import VerifyEmail from "./pages/VerifyEmailPage.jsx";
+import AccountantDashboardPage from "./pages/AccountantDashboardPage.jsx";
+import AuthCallback from './pages/AuthCallbackPage.jsx';
+import io from "socket.io-client";
+import FinancialManagerPage from "./pages/FinancialManagerPage.jsx";
+
 // Composant qui utilise useNavigate() et contient la logique de navigation vocale et les routes
 function MainApp() {
   const userId = "67bde12663b4be3e706162f3";
@@ -88,12 +92,13 @@ function MainApp() {
           <Route path="/" element={<AccessDeniedPage />} />
           <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/Financial-manager-dashboard" element={<FinancialManagerPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:userId/:token" element={<ResetPasswordPage />} />
           <Route exact path="/complete-profile" element={<CompleteProfile />} />
+          <Route path="/auth-callback" element={<AuthCallback />} />
         <Route path="/confirmation" element={<Confirmation />} />
         <Route path="/deleteUsers" element={<AdminPanel/>} />
-        <Route path="/StatUsers" element={<StatPage/>} />
         <Route path="/verify-email" element={<VerifyEmail />} /> {/* Nouvelle route */}
 
 
@@ -105,6 +110,15 @@ function MainApp() {
               </PrivateRoute>
             }
           />
+           <Route
+            path="/Financial-manager-dashboard"
+            element={
+              <PrivateRoute allowedRoles={["Financial manager"]}>
+                <FinancialManagerPage />
+              </PrivateRoute>
+            }
+          />
+
           <Route
             path="/business-owner-dashboard"
             element={
@@ -113,6 +127,15 @@ function MainApp() {
               </PrivateRoute>
             }
           />
+            <Route
+            path="/accountant-dashboard"
+            element={
+              <PrivateRoute allowedRoles={["Accountant"]}>
+                <AccountantDashboardPage />
+              </PrivateRoute>
+            }
+          />
+         
 
           <Route
             path="/comptes-bancaires"

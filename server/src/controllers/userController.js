@@ -1,10 +1,7 @@
-
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const { User } = require("../models/user");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
 
@@ -79,7 +76,7 @@ const signInUser = async (req, res) => {
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "2h" }
+            { expiresIn: "4h" }
         );
 
         res.status(200).json({

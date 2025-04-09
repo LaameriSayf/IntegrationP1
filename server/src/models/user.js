@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     lastLogin: { type: Date },
-    estActif: { type: Boolean, default: false }
+    widgets: { type: [String], default: ["totalBalance", "recentTransactions"] }
     
 
   },

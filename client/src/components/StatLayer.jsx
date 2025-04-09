@@ -178,47 +178,6 @@ const StatPage = () => {
                             )}
                         </div>
                     </div>
-                    <div style={sectionStyle}>
-                        <h3 style={{ fontSize: "1.8rem", color: "#1e40af", marginBottom: "20px" }}>
-                            User Activity
-                        </h3>
-                        <table style={tableStyle}>
-                            <thead>
-                                <tr>
-                                    <th style={thStyle}>Name</th>
-                                    <th style={thStyle}>Email</th>
-                                    <th style={thStyle}>Last Login</th>
-                                    <th style={thStyle}>Daily Logins</th>
-                                    <th style={thStyle}>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {userStats.length > 0 ? (
-                                    userStats.map((user) => (
-                                        <tr key={user.email} style={{ animation: "fadeUp 0.5s ease-out" }}>
-                                            <td style={tdStyle}>{user.name}</td>
-                                            <td style={tdStyle}>{user.email}</td>
-                                            <td style={tdStyle}>
-                                                {user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "Never"}
-                                            </td>
-                                            <td style={tdStyle}>{user.dailyLoginCount}</td>
-                                            <td style={tdStyle}>
-                                                <span style={statusStyle(user.estActif)}>
-                                                    {user.estActif ? "Active" : "Inactive"}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="5" style={{ ...tdStyle, textAlign: "center" }}>
-                                            No user data available
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
                 </>
             )}
         </div>
@@ -226,3 +185,4 @@ const StatPage = () => {
 };
 
 export default StatPage;
+

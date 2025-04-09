@@ -36,3 +36,5 @@ compteBancaireSchema.pre('save', async function (next) {
 });
 
 module.exports = mongoose.model('CompteBancaire', compteBancaireSchema, 'compteBancaire');
+
+

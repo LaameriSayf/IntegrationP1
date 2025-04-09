@@ -23,30 +23,7 @@ const UnitCountOne = () => {
                 </div>
             </div>
         </div>
-        <div className="col">
-                <div className="card shadow-none border bg-gradient-start-3 h-100"
-                onClick={() => navigate('/StatUsers')}
-                style={{ cursor: 'pointer' }}>
-                    <div className="card-body p-20">
-                        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                            <div>
-                                <p className="fw-medium text-primary-light mb-1">
-                                    Stat Users
-                                </p>
-                               
-                            </div>
-                            <div className="w-50-px h-50-px bg-info rounded-circle d-flex justify-content-center align-items-center">
-                                <Icon
-                                    icon="fluent:people-20-filled"
-                                    className="text-white text-2xl mb-0"
-                                />
-                            </div>
-                        </div>
-                       
-                    </div>
-                </div>
-                {/* card end */}
-            </div>
+        
             <div className="col">
                 <div className="card shadow-none border bg-gradient-start-3 h-100">
                     <div className="card-body p-20">
